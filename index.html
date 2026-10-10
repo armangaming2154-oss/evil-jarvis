@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EVIL JARVIS</title>
+  <style>
+    :root {
+      --bg: #070b12;
+      --line: rgba(255, 92, 92, 0.2);
+      --line-strong: rgba(255, 76, 76, 0.6);
+      --red2: #ff6b57;
+      --cyan: #64e7ff;
+      --text: #edf6ff;
+      --muted: #9ab0c0;
+      --soft: #dfeaf8;
+      --green: #7ef7b3;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: Inter, "Segoe UI", system-ui, sans-serif;
+      background:
+        radial-gradient(circle at 20% 15%, rgba(255, 77, 77, 0.12), transparent 26%),
+        radial-gradient(circle at 80% 10%, rgba(100, 231, 255, 0.07), transparent 20%),
+        linear-gradient(180deg, var(--bg) 0%, #050a12 100%);
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    body { min-height: 100vh; }
+
+    button, input, textarea {
+      font: inherit;
+    }
+
+    .app {
+      display: flex;
+      width: 100%;
+      height: 100vh;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 270px;
+      background: rgba(8, 12, 18, 0.96);
+      border-right: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      padding: 22px 16px 16px;
+      flex-shrink: 0;
+      z-index: 15;
+      box-shadow: inset -1px 0 24px rgba(255, 77, 77, 0.06);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 4px 8px 18px;
+      border-bottom: 1px solid rgba(255,255,255,0.04);
+      margin-bottom: 18px;
+    }
+
+    .brand-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 12px;
+      display: grid;
+      place-items: center;
+      font-size: 22px;
+      color: var(--red2);
+      border: 1px solid var(--line-strong);
+      background: linear-gradient(135deg, rgba(255, 77, 77, 0.14), rgba(29, 44, 61, 0.9));
+      box-shadow: 0 0 22px rgba(255, 77, 77, 0.18);
+    }
+
+    .brand-text h2 {
+      margin: 0;
+      font-size: 1.05rem;
+      letter-spacing: 0.22rem;
+      font-weight: 800;
+    }
+
+    .brand-text p {
+      margin: 3px 0 0;
+      color: var(--muted);
+      letter-spacing: 0.18rem;
+      font-size: 0.62rem;
+    }
+
+    .new-chat {
+      width: 100%;
+      padding: 12px 14px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, rgba(255,80,80,0.12), rgba(255,255,255,0.02));
+      border: 1px solid var(--line-strong);
+      color: var(--red2);
+      font-weight: 700;
+      font-size: 0.92rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+      margin-bottom: 18px;
+    }
+
+    .section-title {
+      color: var(--muted);
+      font-size: 0.65rem;
+      letter-spacing: 0.2rem;
+      text-transform: uppercase;
+      padding: 6px 8px 10px;
+      margin-bottom: 4px;
+    }
+
+    .history {
+      flex: 1;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .history-item {
+      width: 100%;
+      display: block;
+      border: 1px solid transparent;
+      background: transparent;
+      color: var(--soft);
+      text-align: left;
+      padding: 11px 10px;
+      border-radius: 10px;
+      margin-bottom: 5px;
+      cursor: pointer;
+      transition: 0.18s ease;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 0.86rem;
+    }
+
+    .history-item:hover, .history-item.active {
+      background: linear-gradient(135deg, rgba(255,76,76,0.09), rgba(100,231,255,0.04));
+      border-color: var(--line);
+    }
+
+    .profile {
+      margin-top: 14px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      padding-top: 16px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .avatar {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: linear-gradient(135deg, rgba(255,80,80,0.15), rgba(59,130,246,0.18));
+      border: 1px solid var(--line-strong);
+      color: var(--red2);
+      font-weight: 700;
+      box-shadow: 0 0 16px rgba(255,77,77,0.16);
+    }
+
+    .profile strong {
+      display: block;
+      font-size: 0.85rem;
+      letter-spacing: 0.06rem;
+    }
+
+    .profile p {
+      margin: 4px 0 0;
+      font-size: 0.68rem;
+      color: var(--muted);
+    }
+
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      min-width: 0;
+      position: relative;
+      background: radial-gradient(circle at 50% 20%, rgba(255, 77, 77, 0.08), transparent 28%), rgba(9, 12, 18, 0.32);
+    }
+
+    .topbar {
+      height: 74px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 24px;
+      background: rgba(12,17,25,0.8);
+      backdrop-filter: blur(12px);
+      flex-shrink: 0;
+    }
+
+    .top-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .mobile-menu {
+      display: none;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+      color: var(--red2);
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1.15rem;
+    }
+
+    .heading {
+      font-weight: 800;
+      letter-spacing: 0.12rem;
+      text-transform: uppercase;
+      font-size: 0.97rem;
+    }
+
+    .heading .accent {
+      background: linear-gradient(90deg, var(--red2), var(--cyan), #f7c6ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .status-row {
+      margin-top: 5px;
+      color: var(--green);
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.68rem;
+      letter-spacing: 0.08rem;
+      text-transform: uppercase;
+    }
+
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 14px #60ffb7;
+    }
+
+    .top-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .top-btn {
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line);
+      color: var(--soft);
+      padding: 9px 14px;
+      border-radius: 10px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .content {
+      flex: 1;
+      overflow-y: auto;
+      padding: 22px 18px 0;
+      position: relative;
+    }
+
+    .welcome {
+      min-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+      padding: 20px 14px 30px;
+    }
+
+    .orb {
+      width: 128px;
+      height: 128px;
+      position: relative;
+      margin-bottom: 24px;
+      display: grid;
+      place-items: center;
+    }
+
+    .orb::before, .orb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 1px solid rgba(255,90,90,0.55);
+      animation: spin 10s linear infinite;
+    }
+
+    .orb::after {
+      inset: 14px 4px;
+      border-color: rgba(100,231,255,0.48);
+      animation-direction: reverse;
+      animation-duration: 7s;
+    }
+
+    .orb-core {
+      width: 78px;
+      height: 78px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      font-size: 2.1rem;
+      color: var(--red2);
+      background: radial-gradient(circle at 30% 30%, rgba(255, 92, 92, 0.28), rgba(15, 25, 38, 0.9) 65%);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 0 28px rgba(255,76,76,0.2);
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .welcome h1 {
+      font-size: clamp(2rem, 3vw, 3.5rem);
+      line-height: 1.1;
+      letter-spacing: 0.14rem;
+      margin: 0;
+      font-weight: 900;
+      text-transform: uppercase;
+    }
+
+    .welcome h1 .accent {
+      background: linear-gradient(90deg, var(--red2), var(--cyan));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .welcome > p {
+      max-width: 520px;
+      color: var(--muted);
+      font-size: 1rem;
+      line-height: 1.8;
+      margin: 18px auto 0;
+    }
+
+    .cards {
+      width: min(100%, 700px);
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 30px;
+    }
+
+    .card {
+      text-align: left;
+      background: linear-gradient(135deg, rgba(17,26,37,0.98), rgba(11,18,28,0.96));
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 18px 16px;
+      color: var(--text);
+      cursor: pointer;
+      transition: 0.18s ease;
+      min-height: 140px;
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      border-color: var(--line-strong);
+      box-shadow: 0 0 22px rgba(255,77,77,0.12);
+    }
+
+    .card .emoji {
+      display: inline-grid;
+      place-items: center;
+      width: 34px;
+      height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, rgba(255,77,77,0.18), rgba(77, 141, 255, 0.08));
+      border: 1px solid rgba(255,255,255,0.06);
+      font-size: 1.1rem;
+    }
+
+    .card h4 {
+      margin: 12px 0 6px;
+      font-size: 0.9rem;
+      letter-spacing: 0.06rem;
+      text-transform: uppercase;
+    }
+
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.74rem;
+      line-height: 1.55;
+    }
+
+    .messages {
+      width: min(100%, 820px);
+      margin: 0 auto 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      padding-bottom: 10px;
+    }
+
+    .message {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .message.user { flex-direction: row-reverse; }
+
+    .msg-avatar {
+      width: 34px;
+      height: 34px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      font-size: 0.9rem;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.02);
+      flex-shrink: 0;
+    }
+
+    .message.user .msg-avatar { color: var(--cyan); border-color: rgba(100,231,255,0.35); }
+    .message.assistant .msg-avatar { color: var(--red2); border-color: rgba(255,77,77,0.38); }
+
+    .bubble {
+      max-width: 82%;
+      border-radius: 14px 14px 14px 6px;
+      border: 1px solid var(--line);
+      background: rgba(16,24,35,0.9);
+      padding: 13px 15px;
+      font-size: 0.96rem;
+      line-height: 1.75;
+      color: var(--text);
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+      box-shadow: 0 0 20px rgba(0,0,0,0.12);
+    }
+
+    .message.user .bubble {
+      border-radius: 14px 14px 6px 14px;
+      background: linear-gradient(135deg, rgba(25, 57, 77, 0.95), rgba(10, 19, 28, 0.96));
+      border-color: rgba(100, 231, 255, 0.28);
+    }
+
+    .composer-shell {
+      padding: 14px 18px 18px;
+      background: linear-gradient(180deg, transparent 0%, rgba(7,11,18,0.68) 20%, rgba(7,11,18,1) 100%);
+      flex-shrink: 0;
+    }
+
+    .composer {
+      width: min(100%, 820px);
+      margin: 0 auto;
+      border: 1px solid rgba(255, 118, 118, 0.35);
+      background: rgba(14,20,28,0.9);
+      border-radius: 18px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.18);
+      padding: 12px 12px 10px;
+    }
+
+    .composer textarea {
+      width: 100%;
+      background: transparent;
+      border: none;
+      resize: none;
+      min-height: 52px;
+      max-height: 142px;
+      outline: none;
+      color: var(--text);
+      line-height: 1.6;
+      font-size: 0.96rem;
+      padding: 10px 8px 2px;
+    }
+
+    .composer textarea::placeholder {
+      color: rgba(154,176,192,0.84);
+    }
+
+    .composer-bottom {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding-top: 6px;
+    }
+
+    .composer-status {
+      color: var(--muted);
+      font-size: 0.65rem;
+      letter-spacing: 0.12rem;
+      text-transform: uppercase;
+    }
+
+    .tools {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tool-btn, .send-btn {
+      border: none;
+      cursor: pointer;
+      transition: 0.18s ease;
+    }
+
+    .tool-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--line);
+      color: var(--red2);
+      font-size: 1.05rem;
+    }
+
+    .send-btn {
+      width: 44px;
+      height: 38px;
+      border-radius: 11px;
+      display: grid;
+      place-items: center;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #041219;
+      background: linear-gradient(135deg, var(--red2), #fca5a5);
+      box-shadow: 0 0 18px rgba(255, 77, 77, 0.2);
+    }
+
+    .footer-note {
+      text-align: center;
+      color: rgba(148, 164, 179, 0.9);
+      font-size: 0.63rem;
+      letter-spacing: 0.14rem;
+      text-transform: uppercase;
+      margin-top: 14px;
+    }
+
+    .hidden { display: none !important; }
+
+    @media (max-width: 760px) {
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 270px;
+        transform: translateX(-105%);
+        transition: transform 0.25s ease;
+        z-index: 30;
+        box-shadow: 16px 0 32px rgba(0,0,0,0.32);
+      }
+
+      .sidebar.open { transform: translateX(0); }
+
+      .mobile-menu { display: inline-grid; place-items: center; }
+      .cards { grid-template-columns: 1fr; }
+      .topbar { padding: 0 14px; }
+      .composer-shell { padding-left: 12px; padding-right: 12px; }
+      .bubble { max-width: 88%; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar" id="sidebar">
+      <div class="brand">
+        <div class="brand-icon">✳</div>
+        <div class="brand-text">
+          <h2>EVIL JARVIS</h2>
+          <p>ULTRON CORE</p>
+        </div>
+      </div>
+
+      <button class="new-chat" id="newChat">+ New conversation</button>
+
+      <div class="section-title">Recent chats</div>
+      <div class="history" id="history"></div>
+
+      <div class="profile">
+        <div class="avatar">E</div>
+        <div>
+          <strong>EVIL SYSTEM</strong>
+          <p>Ready</p>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div class="top-left">
+          <button class="mobile-menu" id="menuBtn">☰</button>
+          <div>
+            <div class="heading">EVIL <span class="accent">JARVIS</span></div>
+            <div class="status-row">
+              <span class="dot"></span>
+              <span>System online</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="top-actions">
+          <button class="top-btn" id="voiceBtn">◖ Voice</button>
+          <button class="top-btn" id="clearChat">Clear</button>
+        </div>
+      </header>
+
+      <section class="content" id="content">
+        <div class="welcome" id="welcome">
+          <div class="orb">
+            <div class="orb-core">✳</div>
+          </div>
+
+          <h1>EVIL <span class="accent">JARVIS</span></h1>
+          <p>A dark, ruthless AI assistant built for power, precision, and execution. Code, plan, learn, and dominate with a brutal edge.</p>
+
+          <div class="cards">
+            <button class="card" data-prompt="Build a powerful app for me">
+              <span class="emoji">⌘</span>
+              <h4>Build</h4>
+              <p>Create software with sharp logic and strong architecture.</p>
+            </button>
+
+            <button class="card" data-prompt="Teach me something advanced and practical">
+              <span class="emoji">✧</span>
+              <h4>Learn</h4>
+              <p>Break down difficult concepts into actionable insight.</p>
+            </button>
+
+            <button class="card" data-prompt="Plan my next project like a strategist">
+              <span class="emoji">◈</span>
+              <h4>Strategy</h4>
+              <p>Turn chaos into goals, steps, and winning systems.</p>
+            </button>
+
+            <button class="card" data-prompt="Talk to me like a battle-ready AI">
+              <span class="emoji">◎</span>
+              <h4>Converse</h4>
+              <p>Start the mission and let the system think with you.</p>
+            </button>
+          </div>
+        </div>
+
+        <div class="messages hidden" id="messages"></div>
+      </section>
+
+      <div class="composer-shell">
+        <div class="composer">
+          <textarea id="prompt" rows="1" placeholder="Message EVIL JARVIS..." aria-label="Message EVIL JARVIS"></textarea>
+          <div class="composer-bottom">
+            <span class="composer-status" id="statusNote">Ready</span>
+            <div class="tools">
+              <button class="tool-btn" id="micBtn" title="Voice input">🎙</button>
+              <button class="send-btn" id="sendBtn" title="Send">↑</button>
+            </div>
+          </div>
+        </div>
+        <div class="footer-note">EVIL JARVIS · CORE ONLINE</div>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    const $ = (id) => document.getElementById(id);
+
+    let chats = JSON.parse(localStorage.getItem('evilJarvisChats') || '[]');
+    let currentChat = null;
+    let recognition = null;
+
+    function safeSaveChats() {
+      localStorage.setItem('evilJarvisChats', JSON.stringify(chats));
+    }
+
+    function createChat() {
+      const chat = { id: Date.now(), title: 'New conversation', messages: [] };
+      chats.unshift(chat);
+      currentChat = chat;
+      safeSaveChats();
+      renderHistory();
+      renderMessages();
+    }
+
+    function renderHistory() {
+      const history = $('history');
+      history.innerHTML = '';
+
+      chats.forEach((chat) => {
+        const btn = document.createElement('button');
+        btn.className = 'history-item' + (chat.id === currentChat?.id ? ' active' : '');
+        btn.textContent = (chat.id === currentChat?.id ? '● ' : ' ') + chat.title;
+        btn.onclick = () => {
+          currentChat = chat;
+          renderHistory();
+          renderMessages();
+          $('sidebar').classList.remove('open');
+        };
+        history.appendChild(btn);
+      });
+    }
+
+    function addMessage(role, text) {
+      if (!currentChat) createChat();
+      currentChat.messages.push({ role, text });
+      if (role === 'user' && currentChat.title === 'New conversation') {
+        currentChat.title = text.slice(0, 28) || 'New conversation';
+      }
+      safeSaveChats();
+      renderHistory();
+      renderMessages();
+    }
+
+    function renderMessages() {
+      const welcome = $('welcome');
+      const messagesBox = $('messages');
+
+      if (!currentChat || currentChat.messages.length === 0) {
+        welcome.classList.remove('hidden');
+        messagesBox.classList.add('hidden');
+        return;
+      }
+
+      welcome.classList.add('hidden');
+      messagesBox.classList.remove('hidden');
+      messagesBox.innerHTML = '';
+
+      currentChat.messages.forEach((msg) => {
+        const row = document.createElement('div');
+        row.className = 'message ' + msg.role;
+
+        const avatar = document.createElement('div');
+        avatar.className = 'msg-avatar';
+        avatar.textContent = msg.role === 'user' ? 'U' : 'E';
+
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.textContent = msg.text;
+
+        row.appendChild(avatar);
+        row.appendChild(bubble);
+        messagesBox.appendChild(row);
+      });
+
+      const content = $('content');
+      content.scrollTop = content.scrollHeight;
+    }
+
+    function speakText(text) {
+      if ('speechSynthesis' in window) {
+        speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = 1;
+        speechSynthesis.speak(utterance);
+      }
+    }
+
+    function generateFallbackReply(prompt) {
+      const lower = prompt.toLowerCase();
+
+      if (lower.includes('code') || lower.includes('build') || lower.includes('app')) {
+        return 'Target locked. Your app architecture is clear, and the system is ready to build with speed and precision. Add the project scope, and I will structure the code and execution plan.';
+      }
+
+      if (lower.includes('plan') || lower.includes('strategy') || lower.includes('project')) {
+        return 'Mission planning is active. First define the goal, then break it into phases, risks, and delivery checkpoints. I can structure the roadmap and the execution stack in minutes.';
+      }
+
+      if (lower.includes('learn') || lower.includes('teach')) {
+        return 'Learning mode engaged. Tell me the subject, level, and objective. I will turn theory into a focused, ruthless learning path.';
+      }
+
+      return 'System acknowledged. The core is online, and your input has been received. Give me the exact task, and I will resolve it with precision and force.';
+    }
+
+    async function sendMessage() {
+      const input = $('prompt');
+      const text = input.value.trim();
+      if (!text) return;
+
+      addMessage('user', text);
+      input.value = '';
+      input.style.height = '52px';
+
+      const reply = generateFallbackReply(text);
+      addMessage('assistant', reply);
+      speakText(reply);
+      $('statusNote').textContent = 'Ready';
+    }
+
+    $('sendBtn').onclick = sendMessage;
+    $('newChat').onclick = createChat;
+
+    $('clearChat').onclick = () => {
+      if (!currentChat) return;
+      currentChat.messages = [];
+      currentChat.title = 'New conversation';
+      safeSaveChats();
+      renderHistory();
+      renderMessages();
+    };
+
+    $('prompt').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        sendMessage();
+      }
+    });
+
+    $('prompt').addEventListener('input', function () {
+      this.style.height = '52px';
+      this.style.height = Math.min(this.scrollHeight, 142) + 'px';
+    });
+
+    document.querySelectorAll('.card').forEach((card) => {
+      card.onclick = () => {
+        const prompt = card.dataset.prompt;
+        const input = $('prompt');
+        input.value = prompt;
+        input.focus();
+        input.style.height = '52px';
+      };
+    });
+
+    $('micBtn').onclick = () => {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert('Voice input is not supported in this browser.');
+        return;
+      }
+
+      if (recognition) {
+        recognition.stop();
+        recognition = null;
+        $('statusNote').textContent = 'Mic ready';
+        return;
+      }
+
+      recognition = new SpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.interimResults = false;
+
+      recognition.onstart = () => {
+        $('statusNote').textContent = 'Listening...';
+      };
+
+      recognition.onresult = (event) => {
+        const transcript = event.results[0][0].transcript;
+        $('prompt').value = transcript;
+        $('prompt').focus();
+        $('statusNote').textContent = 'Voice captured';
+        sendMessage();
+      };
+
+      recognition.onerror = () => {
+        $('statusNote').textContent = 'Voice error';
+      };
+
+      recognition.onend = () => {
+        recognition = null;
+      };
+
+      recognition.start();
+    };
+
+    $('voiceBtn').onclick = () => {
+      const intro = 'EVIL JARVIS online. System active. Core stable. Input accepted.';
+      speakText(intro);
+    };
+
+    $('menuBtn').onclick = () => {
+      $('sidebar').classList.toggle('open');
+    };
+
+    if (!chats.length) {
+      createChat();
+    } else {
+      currentChat = chats[0];
+      renderHistory();
+      renderMessages();
+    }
+  </script>
+</body>
+</html>
